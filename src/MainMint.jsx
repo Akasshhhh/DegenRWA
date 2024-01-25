@@ -1,52 +1,107 @@
 import React, { useState } from 'react'
-import { ethers,BigNumber } from 'ethers'
+import { ethers, BigNumber } from 'ethers'
 import DegenRWA from './DegenRWA.json'
+import { Box, Button, Flex, Input, Text } from '@chakra-ui/react'
+import toast from 'react-hot-toast'
 
-const DegenRWAContractAddress = "0x30Ecb95D0eEee8DA40C7B611ef46e38A2D774De2"
 
-const MainMint = ({accounts,setAccounts}) => {
+const DegenRWAContractAddress = "0x3F85dc7c7Daef24D27079293305abED370C1B121"
+
+const MainMint = ({ accounts, setAccounts }) => {
   const [mintAmount, setMintAmount] = useState(1)
   const isConnected = Boolean(accounts[0])
 
-  const handleDecrement = () =>{
-    if(mintAmount <= 1) return
-    setMintAmount(mintAmount-1)
+  const handleDecrement = () => {
+    if (mintAmount <= 1) return
+    setMintAmount(mintAmount - 1)
   }
-  const handleIncrement = () =>{
-    if(mintAmount >= 3) return
-    setMintAmount(mintAmount+1)
+  const handleIncrement = () => {
+    if (mintAmount >= 3) return
+    setMintAmount(mintAmount + 1)
   }
 
-  async function handleMint(){
-    if(window.ethereum) {
+  async function handleMint() {
+    if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const signer = provider.getSigner()
-      const contract = new ethers.Contract(DegenRWAContractAddress,DegenRWA.abi,signer)
-
+      const contract = new ethers.Contract(DegenRWAContractAddress, DegenRWA.abi, signer)
+  
       try {
-        const response = await contract.mint(BigNumber.from(mintAmount))
-        console.log('response',response)
-      } catch(e){
-        console.log(e)
+        const tx = await contract.mint(BigNumber.from(mintAmount), {
+          value: ethers.utils.parseEther((1 * mintAmount).toString())
+        })
+  
+        // Wait for the transaction to be mined
+        const receipt = await tx.wait()
+  
+        // Check if the transaction was successful
+        if (receipt.status === 1) {
+          toast.success("Minted Successfully")
+        } else {
+          toast.error("Mint failed")
+        }
+      } catch (e) {
+        console.error(e)
+        toast.error("Error while minting")
       }
     }
   }
+  
   return (
-    <div>
-      <h1>DegenRWA</h1>
-      <p>Experience the future of NFTs with our project, seamlessly merging futuristic aesthetics with real-world assets. Dive into a realm where digital and tangible intertwine, as visionary artists craft exclusive pieces that transcend the boundaries of the virtual space.</p>
-      {isConnected?
-      (<div>
+    <Flex justify="center" align="center" height="100vh" paddingBottom="160px">
+      <Box width="600px">
         <div>
-          <button onClick={handleDecrement}>-</button>
-          <input type='number' value={mintAmount} />
-          <button onClick={handleIncrement}>+</button>
+          <Text fontSize="48px" textShadow="0 5px #000000">DegenRWA</Text>
+          <Text fontSize="30px" letterSpacing="%" fontFamily="VT323" textShadow="0 2px 2px #000000">Sculpted from stardust and forgotten lullabies, its architecture sings forbidden harmonies. Own a fragment of its melody, an NFT echoing with cosmic whispers. Unravel the city's secrets, one note at a time.</Text>
         </div>
-        <button onClick={handleMint}>Mint Now</button>
-      </div>):(<div>
-        <p>Connect your wallet.</p>
-      </div>)}
-    </div>
+        {isConnected ?
+          (<div>
+            <Flex justify="center" align="center">
+              <Button onClick={handleDecrement}
+                backgroundColor="#D6517D"
+                borderRadius="5px"
+                boxShadow="0px 2px 2px 1px #0F0F0F"
+                color="white"
+                cursor="pointer"
+                fontFamily="inherit"
+                padding="15px"
+                marginTop="10px"
+              >-</Button>
+              <Input type='number' value={mintAmount}
+                readOnly
+                fontFamily="inherit"
+                width="100px"
+                height="40px"
+                textAlign="center"
+                paddingLeft="19px"
+                marginTop="10px"
+              />
+              <Button onClick={handleIncrement}
+                backgroundColor="#D6517D"
+                borderRadius="5px"
+                boxShadow="0px 2px 2px 1px #0F0F0F"
+                color="white"
+                cursor="pointer"
+                fontFamily="inherit"
+                padding="15px"
+                marginTop="10px"
+              >+</Button>
+            </Flex>
+            <Button onClick={handleMint}
+              backgroundColor="#D6517D"
+              borderRadius="5px"
+              boxShadow="0px 2px 2px 1px #0F0F0F"
+              color="white"
+              cursor="pointer"
+              fontFamily="inherit"
+              padding="15px"
+              marginTop="10px"
+            >Mint Now</Button>
+          </div>) : (<div>
+            <p >Connect your wallet to mint.</p>
+          </div>)}
+      </Box>
+    </Flex>
   )
 }
 
