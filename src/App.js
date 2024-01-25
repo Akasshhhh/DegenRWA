@@ -6,6 +6,7 @@ import NavBar from './NavBar';
 function App() {
   const [accounts, setAccounts] = useState([])
   return (
+    <>
     <div className='overlay'>
     <div className="App">
       <NavBar accounts={accounts} setAccounts={setAccounts} />
@@ -13,6 +14,7 @@ function App() {
     </div>
     <div className='moving-bg'></div>
     </div>
+    </>
   );
 }
 
