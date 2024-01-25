@@ -12,7 +12,7 @@ function App() {
       <NavBar accounts={accounts} setAccounts={setAccounts} />
       <MainMint accounts={accounts} setAccounts={setAccounts} />
     </div>
-    <div className='moving-bg'></div>
+    <video width="100%" height="100%" className='moving-bg'></video>
     </div>
     </>
   );
