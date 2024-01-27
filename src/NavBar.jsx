@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Button, Flex, Image, Link } from '@chakra-ui/react'
 import Twitter from './assets/social-media-icons/twitter_32x32.png'
+import toast from 'react-hot-toast';
 
 const NavBar = ({ accounts, setAccounts }) => {
   const isConnected = Boolean(accounts[0]);
@@ -9,6 +10,11 @@ const NavBar = ({ accounts, setAccounts }) => {
     if (window.ethereum) {
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
       setAccounts(accounts)
+      const getChainId = await window.ethereum.request({method: 'eth_chainId'})
+      const chainId = parseInt(getChainId, 16);
+      if(chainId !== 152){
+        toast.error("Change your network to RedbellyDevNet")
+      }
     }
   }
   return (
