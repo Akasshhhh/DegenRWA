@@ -30,23 +30,25 @@ const BurnNFT = ({ accounts }) => {
     try {
       const hexTokenId = "0x" + selectedTokenId.toString(16);
   
+      // Update the ownedTokenIds array first
+      const updatedOwnedTokenIds = ownedTokenIds.filter(id => id !== selectedTokenId);
+      setOwnedTokenIds(updatedOwnedTokenIds);
+  
       const tx = await contract.burn(hexTokenId);
       const receipt = await tx.wait();
   
       if (receipt.status === 1) {
         toast.success(`NFT with Token ID ${selectedTokenId} burned successfully.`);
-        // Remove the burned NFT from the ownedTokenIds array
-        const updatedOwnedTokenIds = ownedTokenIds.filter(id => id !== selectedTokenId);
-        setOwnedTokenIds(updatedOwnedTokenIds);
         setSelectedTokenIndex(0); // Reset selected token index after burning
       } else {
         toast.error(`Failed to burn NFT with Token ID ${selectedTokenId}.`);
       }
     } catch (e) {
-      toast.error("Error Burning NFT");
-      console.log(e);
+        toast.error("Error Burning NFT");
+        console.log(e);
     }
   }
+  
   
 
   const fetchOwnedTokenIds = async () => {
@@ -59,6 +61,7 @@ const BurnNFT = ({ accounts }) => {
         console.log(ownedTokens);
       } catch (e) {
         console.log("Error fetching tokenIds", e);
+        
       }
     }
   };
