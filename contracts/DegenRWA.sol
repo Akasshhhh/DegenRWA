@@ -55,7 +55,7 @@ contract DegenRWA is ERC721, Ownable {
         require(_exists(_tokenId), "Token does not exist");
         require(ownerOf(_tokenId) == msg.sender, "You are not the owner of this token");
 
-        address payable recipient = payable(owner());
+        address payable recipient = payable(msg.sender);
         recipient.transfer(1 ether);
 
         _burn(_tokenId);

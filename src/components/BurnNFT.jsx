@@ -5,7 +5,7 @@ import { useState, React, useEffect } from 'react';
 import { Button, Input } from '@chakra-ui/react';
 import degen from '../assets/degen-kang.png'
 
-const DegenRWAContractAddress = "0x9A8866973C49f84dB6FCE4a4005564b24cfCa2b9";
+const DegenRWAContractAddress = "0xC9A7E4142A686c0decb7A08B4C23d7CC691fb5A8";
 
 const BurnNFT = ({ accounts }) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -14,6 +14,8 @@ const BurnNFT = ({ accounts }) => {
 
   const [ownedTokenIds, setOwnedTokenIds] = useState([]);
   const [selectedTokenIndex, setSelectedTokenIndex] = useState(0);
+  const [burnInProgress, setBurnInProgress] = useState(false);
+
 
   useEffect(() => {
     fetchOwnedTokenIds();
@@ -29,7 +31,7 @@ const BurnNFT = ({ accounts }) => {
   
     try {
       const hexTokenId = "0x" + selectedTokenId.toString(16);
-  
+      setBurnInProgress(true);
       // Update the ownedTokenIds array first
       const updatedOwnedTokenIds = ownedTokenIds.filter(id => id !== selectedTokenId);
       setOwnedTokenIds(updatedOwnedTokenIds);
@@ -46,7 +48,10 @@ const BurnNFT = ({ accounts }) => {
     } catch (e) {
         toast.error("Error Burning NFT");
         console.log(e);
-    }
+    }finally {
+        // Reset burn in progress
+        setBurnInProgress(false);
+      } 
   }
   
   
@@ -80,20 +85,87 @@ const BurnNFT = ({ accounts }) => {
 
   return (
     <div>
-    {ownedTokenIds.length > 0 ? <div>
-    <img width={"350px"} height={"400px"} style={{ border: '4px solid black', borderRadius: '8px', overflow: 'hidden', padding: '5px', background: 'black' }} src={degen} alt="NFT" />
-    <p>Select the NFT TokenId you want to burn </p>
-      <div>
-        <Button onClick={handleDecrement} backgroundColor="#D6517D" borderRadius="5px" boxShadow="0px 2px 2px 1px #0F0F0F" color="white" cursor="pointer" fontFamily="inherit" padding="15px" marginTop="10px">-</Button>
-        <Input value={ownedTokenIds[selectedTokenIndex]} readOnly fontFamily="inherit" width="100px" height="35px" textAlign="center"  marginTop="15px" />
-        <Button onClick={handleIncrement} backgroundColor="#D6517D" borderRadius="5px" boxShadow="0px 2px 2px 1px #0F0F0F" color="white" cursor="pointer" fontFamily="inherit" padding="15px" marginTop="10px">+</Button>
-      </div>
-      <div>
-        <Button onClick={handleBurn} backgroundColor="#D6517D" borderRadius="5px" boxShadow="0px 2px 2px 1px #0F0F0F" color="white" cursor="pointer" fontFamily="inherit" padding="15px" marginTop="10px">Burn NFT</Button>
-      </div>
-    </div>:<p>You do not have any NFTs to burn</p>}
+      {ownedTokenIds.length > 0 ? (
+        <div>
+          <img
+            width={"350px"}
+            height={"400px"}
+            style={{
+              border: '4px solid black',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '5px',
+              background: 'black',
+            }}
+            src={degen}
+            alt="NFT"
+          />
+          <p>Select the NFT TokenId you want to burn </p>
+          <div>
+            <Button
+              onClick={handleDecrement}
+              backgroundColor="#D6517D"
+              borderRadius="5px"
+              boxShadow="0px 2px 2px 1px #0F0F0F"
+              color="white"
+              cursor="pointer"
+              fontFamily="inherit"
+              padding="15px"
+              marginTop="10px"
+            >
+              -
+            </Button>
+            <Input
+              value={ownedTokenIds[selectedTokenIndex]}
+              readOnly
+              fontFamily="inherit"
+              width="100px"
+              height="35px"
+              textAlign="center"
+              marginTop="15px"
+            />
+            <Button
+              onClick={handleIncrement}
+              backgroundColor="#D6517D"
+              borderRadius="5px"
+              boxShadow="0px 2px 2px 1px #0F0F0F"
+              color="white"
+              cursor="pointer"
+              fontFamily="inherit"
+              padding="15px"
+              marginTop="10px"
+            >
+              +
+            </Button>
+          </div>
+          <div>
+            <Button
+              onClick={handleBurn}
+              backgroundColor="#D6517D"
+              borderRadius="5px"
+              boxShadow="0px 2px 2px 1px #0F0F0F"
+              color="white"
+              cursor="pointer"
+              fontFamily="inherit"
+              padding="15px"
+              marginTop="10px"
+            >
+              Burn NFT
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          {burnInProgress ? (
+            <p>Burning NFT...</p>
+          ) : (
+            <p>You do not have any NFTs to burn</p>
+          )}
+        </div>
+      )}
     </div>
   );
+  
 };
 
 export default BurnNFT;

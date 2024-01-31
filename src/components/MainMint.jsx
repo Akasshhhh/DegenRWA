@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import BurnNFT from './BurnNFT'
 
 
-const DegenRWAContractAddress = "0x9A8866973C49f84dB6FCE4a4005564b24cfCa2b9"
+const DegenRWAContractAddress = "0xC9A7E4142A686c0decb7A08B4C23d7CC691fb5A8"
 
 const MainMint = ({ accounts, setAccounts, isMainMintSelected, setIsMainMintSelected }) => {
 
