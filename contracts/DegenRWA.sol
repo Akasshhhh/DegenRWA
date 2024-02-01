@@ -1,8 +1,8 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/token/ERC721/ERC721.sol';
-import '@openzeppelin/access/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract DegenRWA is ERC721, Ownable {
     uint public mintPrice;
@@ -14,6 +14,7 @@ contract DegenRWA is ERC721, Ownable {
     string private imageCID = "QmNww2zNFERgWzZNtx5ZMbYi3wKreo7J3H4sdJg5dV4iF2";
     mapping(address => uint) public walletMints;
     mapping(address => uint[]) private ownedTokens;
+    mapping(address => uint[]) private burntTokens;
 
     constructor() payable ERC721('DegenRWA','DRWA'){
         mintPrice = 1 ether;
@@ -40,7 +41,7 @@ contract DegenRWA is ERC721, Ownable {
         require(walletMintCount + _quantity <= maxPerWallet, "Exceeds per wallet limit");
     
         for (uint i = 0; i < _quantity; i++) {
-            uint newTokenId = totalSupply + i + 1;
+            uint newTokenId = totalSupply + 1;
             totalSupply++;
             ownedTokens[msg.sender].push(newTokenId);
             _safeMint(msg.sender, newTokenId);
@@ -49,17 +50,20 @@ contract DegenRWA is ERC721, Ownable {
         // Update the walletMints mapping after successful mint
         walletMints[msg.sender] = walletMintCount + _quantity;
     }
-    
 
     function burn(uint _tokenId) external {
         require(_exists(_tokenId), "Token does not exist");
-        require(ownerOf(_tokenId) == msg.sender, "You are not the owner of this token");
+        address tokenOwner = ownerOf(_tokenId);
+        require(tokenOwner == msg.sender, "You are not the owner of this token");
 
-        address payable recipient = payable(msg.sender);
-        recipient.transfer(1 ether);
-
+        // Burn the token by destroying it
         _burn(_tokenId);
-        totalSupply--;
+
+        // Transfer 1 ether back to the token owner
+        payable(tokenOwner).transfer(1 ether);
+
+        // Add the burnt token to the mapping
+        burntTokens[msg.sender].push(_tokenId);
 
         // You may want to emit an event indicating a successful burn
         emit Burn(msg.sender, _tokenId);
@@ -69,7 +73,10 @@ contract DegenRWA is ERC721, Ownable {
         return ownedTokens[_owner];
     }
 
+    function getBurntTokens(address _owner) external view returns(uint[] memory){
+        return burntTokens[_owner];
+    }
+
     // Event to signal a successful burn
     event Burn(address indexed owner, uint indexed tokenId);
 }
-
