@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ethers, BigNumber } from 'ethers'
 import DegenRWA from '../DegenRWA.json'
 import { Box, Button, Flex, Input, Text } from '@chakra-ui/react'
 import toast from 'react-hot-toast'
 import BurnNFT from './BurnNFT'
+import degen from '../assets/degen-kang.png';
 
-
-const DegenRWAContractAddress = "0x5D4E7CFe1346e2f36aFa0780a8b1d3072b607718"
+const DegenRWAContractAddress = "0x3c8670ABedd7b650168A8af4695C81f435148318"
 
 const MainMint = ({ accounts, setAccounts, isMainMintSelected, setIsMainMintSelected }) => {
 
@@ -17,53 +17,72 @@ const MainMint = ({ accounts, setAccounts, isMainMintSelected, setIsMainMintSele
 
   const [mintAmount, setMintAmount] = useState(1)
   const isConnected = Boolean(accounts[0])
+  const [nftBalance, setNftBalance] = useState(0)
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const balance = await contract.balanceOf(accounts[0])
+      setNftBalance(balance.toNumber())
+    }
+    if (isConnected) {
+      fetchBalance()
+    }
+  }, [accounts, isConnected])
 
   const handleDecrement = () => {
     if (mintAmount <= 1) return
     setMintAmount(mintAmount - 1)
   }
   const handleIncrement = () => {
-    if (mintAmount >= 3) return
+    if (mintAmount >= 10) return
     setMintAmount(mintAmount + 1)
   }
 
   async function handleMint() {
-
     if (window.ethereum) {
-      const mintLimitReached = await contract.walletMints(accounts[0]) >= 3;
       try {
-        // Check if the user has reached the mint limit
-        if (mintLimitReached) {
-          toast.error("Wallet mint limit reached. Cannot mint more NFTs.");
-          return;
-        }
         const tx = await contract.mint(BigNumber.from(mintAmount), {
           value: ethers.utils.parseEther((1 * mintAmount).toString())
-        })
+        });
 
         // Wait for the transaction to be mined
-        const receipt = await tx.wait()
+        const receipt = await tx.wait();
 
         // Check if the transaction was successful
         if (receipt.status === 1) {
-          toast.success("Minted Successfully")
+          toast.success("Minted Successfully");
         } else {
-          toast.error("Mint failed")
+          toast.error("Mint failed");
         }
       } catch (e) {
-        console.error(e)
-        toast.error("Error while minting")
+        console.error(e);
+        toast.error("Error while minting");
       }
     }
   }
+
 
   return (
     <Flex justify="center" align="center" height="100vh" paddingBottom="160px">
       <Box width="600px">
         {isMainMintSelected === "MainMint" && <div>
-          <Text fontSize="48px" textShadow="0 5px #000000">DegenRWA</Text>
-          <Text fontSize="30px" letterSpacing="%" fontFamily="VT323" textShadow="0 2px 2px #000000">Sculpted from stardust and forgotten lullabies, its architecture sings forbidden harmonies. Own a fragment of its melody, an NFT echoing with cosmic whispers. Unravel the city's secrets, one note at a time.</Text>
+          <Text className='texthehe' fontSize="48px" textShadow="0 5px #000000">DegenRWA</Text>
+          {nftBalance > 0 ?
+            (<>
+              <p>Your NFT:</p>
+              <img src={degen} width={"350px"} alt='NFT'
+                height={"400px"}
+                style={{
+                  border: '4px solid black',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  padding: '8px',
+                  background: 'black',
+                }} />
+            </>) :
+            (<Text fontSize="30px" letterSpacing="%" fontFamily="VT323" textShadow="0 2px 2px #000000">Sculpted from stardust and forgotten lullabies, its architecture sings forbidden harmonies. Own a fragment of its melody, an NFT echoing with cosmic whispers. Unravel the city's secrets, one note at a time.</Text>)}
         </div>}
+        {isMainMintSelected === "MainMint" && nftBalance > 0 ? <p className='phehe'>Wanna mint some more?</p> : <> </>}
         {isConnected && isMainMintSelected === "MainMint" ?
           (<div>
             <Flex justify="center" align="center">

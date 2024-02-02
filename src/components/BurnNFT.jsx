@@ -5,7 +5,7 @@ import { useState, React, useEffect } from 'react';
 import { Button, Input } from '@chakra-ui/react';
 import degen from '../assets/degen-kang.png';
 
-const DegenRWAContractAddress = "0x5D4E7CFe1346e2f36aFa0780a8b1d3072b607718";
+const DegenRWAContractAddress = "0x3c8670ABedd7b650168A8af4695C81f435148318";
 
 const BurnNFT = ({ accounts }) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);

@@ -414,19 +414,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "maxPerWallet",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "maxSupply",
 		"outputs": [
 			{
@@ -550,25 +537,6 @@
 	{
 		"inputs": [],
 		"name": "totalSupply",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "walletMints",
 		"outputs": [
 			{
 				"internalType": "uint256",

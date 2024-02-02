@@ -32,9 +32,18 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('./assets/background/parallax-bg2.gif');
+  background-image: url("./assets/background/parallax-bg2.gif");
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: 40% 40%;
+}
+
+.phehe {
+  padding-top: 10px;
+  font-size: large;
+}
+
+.texthehe {
+  margin: 20px;
 }
