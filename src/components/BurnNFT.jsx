@@ -3,7 +3,7 @@ import DegenRWA from '../DegenRWA.json';
 import toast from 'react-hot-toast';
 import { useState, React, useEffect } from 'react';
 import { Button, Input } from '@chakra-ui/react';
-import degen from '../assets/degen-kang.png'
+import degen from '../assets/degen-kang.png';
 
 const DegenRWAContractAddress = "0x5D4E7CFe1346e2f36aFa0780a8b1d3072b607718";
 
@@ -16,13 +16,12 @@ const BurnNFT = ({ accounts }) => {
   const [selectedTokenIndex, setSelectedTokenIndex] = useState(0);
   const [burnInProgress, setBurnInProgress] = useState(false);
 
-
   useEffect(() => {
     fetchOwnedTokenIds();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accounts]);
 
-  async function handleBurn() {
+  const handleBurn = async () => {
     const selectedTokenId = ownedTokenIds[selectedTokenIndex];
     if (!selectedTokenId) {
       toast.error("Please select an NFT to burn.");
@@ -30,13 +29,13 @@ const BurnNFT = ({ accounts }) => {
     }
   
     try {
-      const hexTokenId = "0x" + selectedTokenId.toString(16);
       setBurnInProgress(true);
       // Update the ownedTokenIds array first
       const updatedOwnedTokenIds = ownedTokenIds.filter(id => id !== selectedTokenId);
       setOwnedTokenIds(updatedOwnedTokenIds);
   
-      const tx = await contract.burn(hexTokenId);
+      // Directly pass the selectedTokenId to the burn function
+      const tx = await contract.burn(selectedTokenId);
       const receipt = await tx.wait();
   
       if (receipt.status === 1) {
@@ -48,25 +47,21 @@ const BurnNFT = ({ accounts }) => {
     } catch (e) {
         toast.error("Error Burning NFT");
         console.log(e);
-    }finally {
+    } finally {
         // Reset burn in progress
         setBurnInProgress(false);
-      } 
-  }
-  
-  
+    } 
+  };
 
   const fetchOwnedTokenIds = async () => {
     if (accounts.length > 0) {
       try {
-        const ownedTokensHex = await contract.getOwnedTokens(accounts[0]);
-        // Convert hex token IDs to decimal format
-        const ownedTokens = ownedTokensHex.map(hexTokenId => parseInt(hexTokenId, 16));
+        // Fetch and set the owned token IDs directly
+        const ownedTokens = await contract.getOwnedTokens(accounts[0]);
         setOwnedTokenIds(ownedTokens);
         console.log(ownedTokens);
       } catch (e) {
         console.log("Error fetching tokenIds", e);
-        
       }
     }
   };
@@ -165,7 +160,6 @@ const BurnNFT = ({ accounts }) => {
       )}
     </div>
   );
-  
 };
 
 export default BurnNFT;
