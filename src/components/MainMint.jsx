@@ -19,15 +19,15 @@ const MainMint = ({ accounts, setAccounts, isMainMintSelected, setIsMainMintSele
   const isConnected = Boolean(accounts[0])
   const [nftBalance, setNftBalance] = useState(0)
 
+  const fetchBalance = async () => {
+    const balance = await contract.balanceOf(accounts[0])
+    setNftBalance(balance.toNumber())
+  }
   useEffect(() => {
-    const fetchBalance = async () => {
-      const balance = await contract.balanceOf(accounts[0])
-      setNftBalance(balance.toNumber())
-    }
     if (isConnected) {
       fetchBalance()
     }
-  }, [accounts, isConnected])
+  }, [accounts, isConnected, handleMint, mintAmount])
 
   const handleDecrement = () => {
     if (mintAmount <= 1) return
@@ -51,6 +51,7 @@ const MainMint = ({ accounts, setAccounts, isMainMintSelected, setIsMainMintSele
         // Check if the transaction was successful
         if (receipt.status === 1) {
           toast.success("Minted Successfully");
+          fetchBalance()
         } else {
           toast.error("Mint failed");
         }
@@ -69,7 +70,7 @@ const MainMint = ({ accounts, setAccounts, isMainMintSelected, setIsMainMintSele
           <Text className='texthehe' fontSize="48px" textShadow="0 5px #000000">DegenRWA</Text>
           {nftBalance > 0 ?
             (<>
-              <p>Your NFT:</p>
+              <p>Your minted NFT:</p>
               <img src={degen} width={"350px"} alt='NFT'
                 height={"400px"}
                 style={{

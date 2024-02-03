@@ -27,17 +27,17 @@ const BurnNFT = ({ accounts }) => {
       toast.error("Please select an NFT to burn.");
       return;
     }
-  
+
     try {
       setBurnInProgress(true);
       // Update the ownedTokenIds array first
       const updatedOwnedTokenIds = ownedTokenIds.filter(id => id !== selectedTokenId);
       setOwnedTokenIds(updatedOwnedTokenIds);
-  
+
       // Directly pass the selectedTokenId to the burn function
       const tx = await contract.burn(selectedTokenId);
       const receipt = await tx.wait();
-  
+
       if (receipt.status === 1) {
         toast.success(`NFT with Token ID ${selectedTokenId} burned successfully.`);
         setSelectedTokenIndex(0); // Reset selected token index after burning
@@ -45,26 +45,37 @@ const BurnNFT = ({ accounts }) => {
         toast.error(`Failed to burn NFT with Token ID ${selectedTokenId}.`);
       }
     } catch (e) {
-        toast.error("Error Burning NFT");
-        console.log(e);
+      toast.error("Error Burning NFT");
+      console.log(e);
     } finally {
-        // Reset burn in progress
-        setBurnInProgress(false);
-    } 
+      // Reset burn in progress
+      setBurnInProgress(false);
+    }
   };
 
   const fetchOwnedTokenIds = async () => {
     if (accounts.length > 0) {
       try {
-        // Fetch and set the owned token IDs directly
+        // Fetch owned and burned tokens
         const ownedTokens = await contract.getOwnedTokens(accounts[0]);
-        setOwnedTokenIds(ownedTokens);
-        console.log(ownedTokens);
+        const burnedTokens = await contract.getBurntTokens(accounts[0]);
+  
+        // Convert the burnedTokens array to a Set for efficient filtering
+        const burnedTokensSet = new Set(burnedTokens.map(id => id.toString())); // Convert to string
+  
+        // Filter out common token IDs
+        const filteredOwnedTokens = ownedTokens.filter(id => !burnedTokensSet.has(id.toString()));
+  
+        setOwnedTokenIds(filteredOwnedTokens);
       } catch (e) {
-        console.log("Error fetching tokenIds", e);
+        console.error("Error fetching tokenIds", e);
       }
     }
   };
+  
+  
+
+
 
   const handleDecrement = () => {
     if (selectedTokenIndex > 0) {
